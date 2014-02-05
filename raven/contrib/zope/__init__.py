@@ -16,6 +16,12 @@ import logging
 
 from raven.utils.stacks import iter_stack_frames
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -76,7 +82,15 @@ class ZopeSentryHandler(SentryHandler):
                     request.stdin.seek(0)
                     body = request.stdin.read()
                     request.stdin.seek(body_pos)
-                    http = dict(headers=request.environ,
+                    #not all request.environ keys are json serializable
+                    envCopy = {}
+                    for key in request.environ:
+                        try:
+                            json.dumps(request.environ[key])
+                            envCopy[key] = request.environ[key]
+                        except TypeError:
+                            pass
+                    http = dict(headers=envCopy,
                                 url=request.getURL(),
                                 method=request.method,
                                 host=request.environ.get('REMOTE_ADDR',
