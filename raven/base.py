@@ -596,7 +596,15 @@ class Client(object):
         """
         Serializes ``data`` into a raw string.
         """
-        return base64.b64encode(zlib.compress(json.dumps(data).encode('utf8')))
+        # not all data keys are json serializable
+        data_copy = {}
+        for key in data:
+            try:
+                json.dumps(data[key])  # check if serializable
+                data_copy[key] = data[key]
+            except TypeError:
+                pass
+        return base64.b64encode(zlib.compress(json.dumps(data_copy).encode('utf8')))
 
     def decode(self, data):
         """
