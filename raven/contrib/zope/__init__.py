@@ -61,7 +61,7 @@ class ZopeSentryHandler(SentryHandler):
                     request = frame.f_locals.get('request', None)
                     #i.e. collective.solr sets request as string
                     if isinstance(request, basestring):
-                        requests = None
+                        request = None
                     if not request:
                         view = frame.f_locals.get('self', None)
                         try:
