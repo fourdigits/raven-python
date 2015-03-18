@@ -13,7 +13,7 @@ from inspect import getouterframes, currentframe, getinnerframes
 from raven.handlers.logging import SentryHandler
 from ZConfig.components.logger.factory import Factory
 import logging
-
+from AccessControl.users import nobody
 from raven.utils.stacks import iter_stack_frames
 
 try:
@@ -107,9 +107,9 @@ class ZopeSentryHandler(SentryHandler):
                                 ]['QUERY_STRING']
                     setattr(record, 'sentry.interfaces.Http', http)
                     user = request.get('AUTHENTICATED_USER', None)
-                    if user is not None:
+                    if user is not None and user != nobody:
                         user_dict = dict(id=user.getId(),
-                                         is_authenticated=user.has_role('Authenticated'),
+                                         is_authenticated=True,
                                          email=user.getProperty('email') or '')
                     else:
                         user_dict = {'is_authenticated': False}
