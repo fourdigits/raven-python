@@ -91,7 +91,9 @@ class ZopeSentryHandler(SentryHandler):
                         try:
                             json.dumps(request.environ[key])
                             envCopy[key] = request.environ[key]
-                        except TypeError:
+                        except (TypeError,
+                                UnicodeDecodeError,
+                                UnicodeEncodeError):
                             pass
                     http = dict(headers=envCopy,
                                 url=request.getURL(),
