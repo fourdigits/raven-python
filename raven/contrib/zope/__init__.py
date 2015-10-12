@@ -110,9 +110,14 @@ class ZopeSentryHandler(SentryHandler):
                     setattr(record, 'sentry.interfaces.Http', http)
                     user = request.get('AUTHENTICATED_USER', None)
                     if user is not None and user != nobody:
+                        email = ''
+                        if hasattr(user, 'getProperty')\
+                           and user.getProperty('email'):
+                            email = user.getProperty('email')
+
                         user_dict = dict(id=user.getId(),
                                          is_authenticated=True,
-                                         email=user.getProperty('email') or '')
+                                         email=email)
                     else:
                         user_dict = {'is_authenticated': False}
                     setattr(record, 'sentry.interfaces.User', user_dict)
