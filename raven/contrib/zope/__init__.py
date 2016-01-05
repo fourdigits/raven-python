@@ -87,6 +87,7 @@ class ZopeSentryHandler(SentryHandler):
                     request.stdin.seek(body_pos)
                     #not all request.environ keys are json serializable
                     envCopy = {}
+                    tags = {}
                     for key in request.environ:
                         try:
                             json.dumps(request.environ[key])
@@ -98,16 +99,21 @@ class ZopeSentryHandler(SentryHandler):
                     http = dict(headers=envCopy,
                                 url=request.getURL(),
                                 method=request.method,
-                                host=request.environ.get('REMOTE_ADDR',
-                                ''), data=body)
+                                host=request.environ.get('REMOTE_ADDR', ''),
+                                data=body)
                     if 'HTTP_USER_AGENT' in http['headers']:
                         if 'User-Agent' not in http['headers']:
                             http['headers']['User-Agent'] = \
                                 http['headers']['HTTP_USER_AGENT']
+                        if 'bot' in http['headers']['HTTP_USER_AGENT']:
+                            tags['crawler'] = True
                     if 'QUERY_STRING' in http['headers']:
-                        http['query_string'] = http['headers'
-                                ]['QUERY_STRING']
+                        http['query_string'] = http['headers']['QUERY_STRING']
+                    if 'HTTP_REFERER' in http['headers']:
+                        tags['referer'] = http['headers']['HTTP_REFERER']
+
                     setattr(record, 'sentry.interfaces.Http', http)
+                    setattr(record, 'tags', tags)
                     user = request.get('AUTHENTICATED_USER', None)
                     if user is not None and user != nobody:
                         email = ''
@@ -120,6 +126,7 @@ class ZopeSentryHandler(SentryHandler):
                                          email=email)
                     else:
                         user_dict = {'is_authenticated': False}
+
                     setattr(record, 'sentry.interfaces.User', user_dict)
                 except (AttributeError, KeyError):
                     logger.warning('Could not extract data from request', exc_info=True)
