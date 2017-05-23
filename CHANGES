@@ -28,7 +28,7 @@ version 3 of the protocol.
 Support includes:
 
 * Sending 'python' as the platform.
-* The 'tags' option (on all constructors that support options).
+4.0.4-gww.3 (2017-05-23)
 * Updated authentication header.
 
 Additionally, the following has changed:
