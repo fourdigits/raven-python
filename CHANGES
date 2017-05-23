@@ -28,7 +28,7 @@ version 3 of the protocol.
 Support includes:
 
 * Sending 'python' as the platform.
-4.0.4-gww.3 (2017-05-23)
+4.0.4-gww.4 (2017-05-23)
 * Updated authentication header.
 
 Additionally, the following has changed:
